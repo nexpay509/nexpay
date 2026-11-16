@@ -9,7 +9,6 @@
         body { background-color: #fafa1a; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
         .container { max-width: 900px; margin: 20px auto; padding: 15px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .btn-primary { background-color: #28a745; color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px; text-align: center; display: block; width: 100%; }
     </style>
 </head>
 <body>
@@ -22,7 +21,7 @@
             <p class="text-gray-600">মোট ব্যালেন্স</p>
             <h2 id="userBalance" class="text-3xl font-bold text-green-600">৳ 1360.00</h2>
             <div class="flex gap-2 mt-4">
-                <button onclick="openDepositModal()" class="bg-blue-600 text-white py-2 px-4 rounded w-1/2 font-bold">ডिपোজিট</button>
+                <button onclick="openDepositModal()" class="bg-blue-600 text-white py-2 px-4 rounded w-1/2 font-bold">ডিপোজিট</button>
                 <button onclick="openWithdrawModal()" class="bg-red-600 text-white py-2 px-4 rounded w-1/2 font-bold">উইথড্র</button>
             </div>
         </div>
@@ -47,7 +46,6 @@
         </div>
     </div>
 
-    <!-- Script to handle logic -->
     <script>
         let balance = 1360.00;
 
@@ -66,7 +64,7 @@
         }
 
         function openDepositModal() {
-            alert('ডিপোজিট অপشن খুলছে...');
+            alert('ডিপোজিট অপশন খুলছে...');
         }
 
         function openWithdrawModal() {
