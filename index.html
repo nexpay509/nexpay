@@ -1,85 +1,264 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEX PAY - Investment Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #fafa1a; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
-        .container { max-width: 900px; margin: 20px auto; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 15px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEX PAY - Investment Platform</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; color: #333; padding-bottom: 70px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  
+  /* Header */
+  .header-container { background: #1a1a1a; padding: 15px; display: flex; align-items: center; color: white; justify-content: space-between; }
+  .logo-area { display: flex; align-items: center; }
+  .logo-placeholder { width: 35px; height: 35px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; font-size: 16px; }
+  
+  /* Auth Screen */
+  .auth-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #1a1a1a; padding: 20px; }
+  .auth-box { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 380px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; }
+  .auth-box h2 { color: #10a879; margin-bottom: 25px; }
+  .form-group { margin-bottom: 15px; text-align: left; }
+  .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
+  .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+  .auth-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; margin: 15px auto 0; display: block; }
+  .toggle-auth { text-align: center; margin-top: 15px; font-size: 14px; }
+  .toggle-auth a { color: #28a745; text-decoration: none; font-weight: bold; }
+
+  /* Banner */
+  .banner-container { width: 100%; height: 160px; background: #333; overflow: hidden; }
+  .banner-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* Balance Section */
+  .balance-section { background: white; padding: 20px; margin: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .balance-label { color: #666; font-size: 14px; }
+  .balance-amount { font-size: 32px; font-weight: bold; margin: 5px 0; color: #333; }
+  .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+  .btn { flex: 1; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-align: center; font-size: 14px; }
+  .btn-deposit { background: #333; color: white; }
+  .btn-withdraw { background: white; color: #333; border: 1px solid #ccc; }
+  .btn-support { background: white; color: #333; border: 1px solid #ccc; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+
+  /* Ticker */
+  .ticker { background: white; padding: 10px 15px; margin: 0 15px; border-radius: 5px; font-size: 13px; color: #555; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .ticker-icon { color: #ffc107; margin-right: 10px; font-size: 16px; }
+
+  /* VIP List */
+  .vip-list { margin: 15px; }
+  .vip-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .vip-thumb { width: 60px; height: 60px; background: #e9ecef; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #495057; font-size: 14px; flex-shrink: 0; }
+  .vip-info { flex-grow: 1; }
+  .vip-info h3 { margin: 0; font-size: 16px; color: #333; }
+  .vip-income { margin: 5px 0; color: #28a745; font-size: 18px; font-weight: bold; }
+  .vip-details { font-size: 12px; color: #888; }
+  .buy-btn { background: #ffc107; color: #333; border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 13px; text-align: center; }
+
+  /* Modal */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 2000; overflow-y: auto; }
+  .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; margin: 20px auto; }
+  .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; text-align: center; }
+  .channel-select { margin: 15px 0; }
+  .channel-option { padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; cursor: pointer; background: #f9f9f9; }
+  .channel-option.active { border-color: #28a745; background: #e8f5e9; }
+  .copy-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 5px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+  .copy-btn { background: #ffc107; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+  /* Profile Menu */
+  .profile-user-card { background: white; padding: 20px; text-align: center; margin-bottom: 15px; border-bottom: 1px solid #eee; }
+  .avatar-big { width: 70px; height: 75px; background: #1a1a1a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 10px; font-weight: bold; }
+  .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+  .menu-grid-item { background: white; padding: 15px 10px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; text-decoration: none; color: #333; }
+  .menu-grid-item i { font-size: 20px; display: block; margin-bottom: 8px; color: #28a745; }
+  .logout-btn { display: block; width: 90%; margin: 20px auto; padding: 15px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+  /* Bottom Nav */
+  .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 1000; }
+  .nav-item { text-align: center; font-size: 12px; color: #666; text-decoration: none; cursor: pointer; }
+  .nav-item.active { color: #28a745; font-weight: bold; }
+  .nav-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+</style>
 </head>
 <body>
 
-    <div class="container" id="app">
-        <h1 class="text-2xl font-bold text-center mb-4">NEX PAY</h1>
-        
-        <!-- Balance Card -->
-        <div class="card text-center">
-            <p class="text-gray-600">মোট ব্যালেন্স</p>
-            <h2 id="userBalance" class="text-3xl font-bold text-green-600">৳ 1360.00</h2>
-            <div class="flex gap-2 mt-4">
-                <button onclick="openDepositModal()" class="bg-blue-600 text-white py-2 px-4 rounded w-1/2 font-bold">ডিপোজিট</button>
-                <button onclick="openWithdrawModal()" class="bg-red-600 text-white py-2 px-4 rounded w-1/2 font-bold">উইথড্র</button>
-            </div>
-        </div>
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="auth-screen screen active">
+  <div class="auth-box">
+    <h2 id="authTitle">ইউজার লগইন</h2>
+    
+    <!-- Login Form -->
+    <div id="loginFormFields">
+      <div class="form-group"><label>ইমেইল অ্যাড্রেস</label><input type="email" id="loginEmail" placeholder="user@gmail.com"></div>
+      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="loginPass" placeholder="পাসওয়ার্ড"></div>
+      <div style="text-align: right; margin-bottom: 10px;"><a href="#" onclick="openModal('resetModal')" style="color: #666; font-size: 13px; text-decoration: none;">পাসওয়ার্ড ভুলে গেছেন?</a></div>
+      <button class="auth-btn" onclick="handleAuth(true)">লগইন</button>
+      <div class="toggle-auth">অ্যাকাউন্ট নেই? <a href="#" onclick="toggleForm(false)">রেজিস্ট্রেশন করুন</a></div>
+    </div>
+    
+    <!-- Register Form -->
+    <div id="registerFormFields" style="display: none;">
+      <div class="form-group"><label>ইমেইল অ্যাড্রেস</label><input type="email" id="regEmail" placeholder="user@gmail.com"></div>
+      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="regPass" placeholder="পাসওয়ার্ড (কমপক্ষে ৬ ডিজিট)"></div>
+      <div class="form-group"><label>কনফার্ম পাসওয়ার্ড</label><input type="password" id="regConfirmPass" placeholder="পুনরায় পাসওয়ার্ড"></div>
+      <button class="auth-btn" onclick="handleAuth(false)">রেজিস্ট্রার</button>
+      <div class="toggle-auth">অ্যাকাউন্ট আছে? <a href="#" onclick="toggleForm(true)">লগইন করুন</a></div>
+    </div>
+  </div>
+</div>
 
-        <!-- VIP Packages -->
-        <div class="space-y-4">
-            <div class="card flex justify-between items-center">
-                <div>
-                    <h3 class="font-bold text-lg">VIP 1</h3>
-                    <p class="text-sm text-gray-500">দৈনিক আয় ৳ ১০০</p>
-                </div>
-                <button onclick="buyVip(1, 1000)" class="bg-amber-500 text-white px-4 py-2 rounded font-bold">১,০০০ টাকা এখনই কিনুন</button>
-            </div>
-            
-            <div class="card flex justify-between items-center">
-                <div>
-                    <h3 class="font-bold text-lg">VIP 2</h3>
-                    <p class="text-sm text-gray-500">দৈনিক আয় ৳ ৮৮৮</p>
-                </div>
-                <button onclick="buyVip(2, 3000)" class="bg-amber-500 text-white px-4 py-2 rounded font-bold">৩,০০০ টাকা এখনই কিনুন</button>
-            </div>
-        </div>
+<!-- PASSWORD RESET MODAL -->
+<div id="resetModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">পাসওয়ার্ড রিসেট</div>
+    <div class="form-group"><label>আপনার রেজিস্টার্ড ইমেইল দিন:</label><input type="email" id="resetEmail" placeholder="user@gmail.com"></div>
+    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">আপনার ইমেইলে একটি পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।</p>
+    <div style="display: flex; gap: 10px;"><button onclick="closeModal('resetModal')" style="flex: 1; padding: 12px; background: #ccc; border: none; border-radius: 5px; cursor: pointer;">বাতিল</button><button onclick="sendPasswordReset()" style="flex: 1; padding: 12px; background: #10a879; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">রিসেট লিংক পাঠান</button></div>
+  </div>
+</div>
+
+<!-- PLATFORM ANNOUNCEMENT POPUP MODAL -->
+<div id="announcementModal" class="modal" style="display: flex;">
+  <div class="modal-content" style="max-width: 340px; text-align: left; font-size: 14px; line-height: 1.6;">
+    <div class="modal-header" style="font-size: 18px; color: #222;">প্ল্যাটফর্ম ঘোষণা</div>
+    <p style="margin: 8px 0;">✨ <b>NEX PAY-তে স্বাগতম।</b></p>
+    <p style="margin: 8px 0;">✔️ <b>সবচেয়ে বিশ্বস্ত বিনিয়োগ এবং সম্পদ ব্যবস্থাপনা অ্যাপ!</b></p>
+    <p style="margin: 8px 0;">➤ নতুন ব্যবহারকারী হিসেবে নিবন্ধন করুন এবং ৩৩০ টাকা পান।</p>
+    <p style="margin: 8px 0;">➤ বন্ধুদের আমন্ত্রণ জানান এবং যথাক্রমে ৩০%, ৩%, এবং ২% পর্যন্ত কমিশন অর্জন করুন।</p>
+    <p style="margin: 8px 0;">➤ ২৪/৭ জমা এবং উত্তোলনের সুবিধা।</p>
+    <p style="margin: 8px 0;">➤ ১০০০ টাকা জমা দিন এবং সাথে সাথে ৩০০ টাকা উত্তোলন করুন।</p>
+    <p style="margin: 12px 0 15px 0;"><b>📈 এখনই আপনার সম্পদ বৃদ্ধির যাত্রা শুরু করুন!</b></p>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+      <button onclick="openTelegramGroup()" style="flex: 1; padding: 10px; background: white; color: #333; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center;">টেলিগ্রাম গ্রুপ</button>
+      <button onclick="closeModal('announcementModal')" style="flex: 1; padding: 10px; background: white; color: #333; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center;">ঠিক আছে</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT WRAPPER -->
+<div id="appContainer" style="display: none;">
+
+  <!-- HOME SCREEN -->
+  <div id="homeScreen" class="screen active">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="logo-placeholder">NP</div>
+        <div style="font-size: 20px; font-weight: bold;">NEX PAY</div>
+      </div>
     </div>
 
-    <script>
-        let balance = 1360.00;
+    <div class="banner-container">
+      <img id="bannerImage" src="https://images.unsplash.com/photo-1556742049-0a52d66a84a6?w=800&auto=format&fit=crop&q=60" alt="Banner">
+    </div>
 
-        function updateUI() {
-            document.getElementById('userBalance').innerText = `৳ ${balance.toFixed(2)}`;
-        }
+    <div class="balance-section">
+      <div class="balance-label">ব্যালেন্স</div>
+      <div class="balance-amount" id="userBalance">৳ 360.00</div>
+      <div class="action-buttons">
+        <button class="btn btn-deposit" onclick="openDepositModal()">ডিপোজিট</button>
+        <button class="btn btn-withdraw" onclick="openWithdrawModal()">উইথড্র</button>
+        <a href="Https://t.me/nexpay_official" target="_blank" class="btn btn-support">কাস্টমার সার্ভিস</a>
+      </div>
+    </div>
 
-        function buyVip(vipLevel, price) {
-            if (balance >= price) {
-                balance -= price;
-                updateUI();
-                alert(`সফলভাবে VIP ${vipLevel} ক্রয় করা হয়েছে!`);
-            } else {
-                alert('আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!');
-            }
-        }
+    <div class="ticker">
+      <span class="ticker-icon">📢</span>
+      <span id="noticeText">সিস্টেম আপডেট চলছে। যেকোনো সমস্যায় কাস্টমার সার্ভিসে যোগাযোগ করুন।</span>
+    </div>
 
-        function openDepositModal() {
-            alert('ডিপোজিট অপশন খুলছে...');
-        }
+    <div class="vip-list">
+      <div class="vip-card"><div class="vip-thumb">VIP 1</div><div class="vip-info"><h3>VIP 1</h3><div class="vip-income">দৈনিক আয় +৳ ২০০</div><div class="vip-details">আয়ের সীমা ৳২০,০০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 1', 1000, 200)">১,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 2</div><div class="vip-info"><h3>VIP 2</h3><div class="vip-income">দৈনিক আয় +৳ ৪৪৪</div><div class="vip-details">আয়ের সীমা ৳৪৪,৪০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 2', 2000, 444)">২,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 3</div><div class="vip-info"><h3>VIP 3</h3><div class="vip-income">দৈনিক আয় +৳ ১,০০০</div><div class="vip-details">আয়ের সীমা ৳১০০,০০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 3', 4000, 1000)">৪,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 4</div><div class="vip-info"><h3>VIP 4</h3><div class="vip-income">দৈনিক আয় +৳ ২,১০৫</div><div class="vip-details">আয়ের সীমা ৳২১০,৫০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 4', 8000, 2105)">৮,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 5</div><div class="vip-info"><h3>VIP 5</h3><div class="vip-income">দৈনিক আয় +৳ ৪,৪৪৪</div><div class="vip-details">আয়ের সীমা ৳৪৪৪,৪০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 5', 16000, 4444)">১৬,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 6</div><div class="vip-info"><h3>VIP 6</h3><div class="vip-income">দৈনিক আয় +৳ ৯,৪১১</div><div class="vip-details">আয়ের সীমা ৳৯৪১,১০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 6', 32000, 9411)">৩২,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 7</div><div class="vip-info"><h3>VIP 7</h3><div class="vip-income">দৈনিক আয় +৳ ২০,০০০</div><div class="vip-details">আয়ের সীমা ৳২,০০০,০০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 7', 64000, 20000)">৬৪,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+      <div class="vip-card"><div class="vip-thumb">VIP 8</div><div class="vip-info"><h3>VIP 8</h3><div class="vip-income">দৈনিক আয় +৳ ৪০,০০০</div><div class="vip-details">আয়ের সীমা ৳৪,০০০,০০০ • ১০০ দিন</div></div><button class="buy-btn" onclick="buyVip('VIP 8', 120000, 40000)">১২০,০০০ টাকা<br><span>এখনই কিনুন</span></button></div>
+    </div>
+  </div>
 
-        function openWithdrawModal() {
-            let amount = prompt('উইথড্র করার পরিমাণ লিখুন:');
-            if (amount) {
-                amount = parseFloat(amount);
-                if (amount > 0 && amount <= balance) {
-                    balance -= amount;
-                    updateUI();
-                    alert('উইথড্র সফল হয়েছে!');
-                } else {
-                    alert('পর্যাপ্ত ব্যালেন্স নেই বা ভুল পরিমাণ দিয়েছেন।');
-                }
-            }
-        }
-    </script>
-</body>
-</html>
+  <!-- DEVICE SCREEN -->
+  <div id="deviceScreen" class="screen">
+    <div class="header-container"><div style="font-size: 18px; font-weight: bold; margin: 0 auto;">আমার ডিভাইস ও দৈনিক আয়</div></div>
+    <div id="deviceList" style="padding: 15px;"><div style="text-align: center; color: #666; margin-top: 50px;">কোনো সক্রিয় ডিভাইস নেই।</div></div>
+  </div>
+
+  <!-- INVITE SCREEN -->
+  <div id="inviteScreen" class="screen">
+    <div class="header-container"><div style="font-size: 18px; font-weight: bold; margin: 0 auto;">ইনভাইট</div></div>
+    <div style="padding: 20px; background: white; margin: 15px; border-radius: 8px; text-align: center;">
+      <h3>আপনার রেফারেল লিংক শেয়ার করুন</h3>
+      <input type="text" id="refLinkInput" value="https://nexpay.hed/ref?id=119268" readonly style="width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+      <button onclick="copyRefLink()" style="padding: 12px 30px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">কপি করুন</button>
+    </div>
+  </div>
+
+  <!-- PROFILE SCREEN -->
+  <div id="profileScreen" class="screen">
+    <div class="header-container"><div style="font-size: 18px; font-weight: bold; margin: 0 auto;">প্রোফাইল</div></div>
+    
+    <div class="profile-user-card">
+      <div class="avatar-big" id="profileInitial">U</div>
+      <h3 id="profileEmailDisplay">user@gmail.com</h3>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-grid-item" onclick="alert('রেজিস্ট্রার বোনাস: ৳360')"><i>🎁</i> রেজিস্টার বোনাস</div>
+      <div class="menu-grid-item" onclick="openHistoryModal()"><i>📋</i> আমার অ্যাকাউন্ট</div>
+      <div class="menu-grid-item" onclick="openDepositModal()"><i>📥</i> ডিপোজিট</div>
+      <div class="menu-grid-item" onclick="openWithdrawModal()"><i>📤</i> উইথড্র</div>
+      <div class="menu-grid-item" onclick="openSupport()"><i>🎧</i> কাস্টমার সার্ভিস</div>
+    </div>
+
+    <button class="logout-btn" onclick="handleLogout()">লগ আউট</button>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <a class="nav-item active" onclick="switchTab('homeScreen', this)"><span class="nav-icon">🏠</span> হোম</a>
+    <a class="nav-item" onclick="switchTab('deviceScreen', this)"><span class="nav-icon">📦</span> ডিভাইস</a>
+    <a class="nav-item" onclick="switchTab('inviteScreen', this)"><span class="nav-icon">👥</span> ইনভাইট</a>
+    <a class="nav-item" onclick="switchTab('profileScreen', this)"><span class="nav-icon">👤</span> আমার</a>
+  </div>
+
+</div>
+
+<!-- DEPOSIT MODAL -->
+<div id="depositModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">ডিপোজিট সিস্টেম</div>
+    <div class="form-group"><label>পরিমাণ (টাকা)</label><input type="number" id="depositAmount" placeholder="1000"></div>
+    <label>পেমেন্ট মাধ্যম:</label>
+    <div class="channel-select">
+      <div class="channel-option active" id="opt-bkash" onclick="selectDepositChannel('bkash')"><strong>bKash Personal</strong></div>
+      <div class="channel-option" id="opt-nagad" onclick="selectDepositChannel('nagad')"><strong>Nagad Personal</strong></div>
+    </div>
+    <div class="copy-box"><span>মার্চেন্ট নম্বর: <b id="depositMerchantNumber">01786688206</b></span><button class="copy-btn" onclick="copyValue('depositMerchantNumber')">কপি</button></div>
+    <div class="form-group"><label>আপনার ট্রানজেকশন আইডি (TrxID) দিন:</label><input type="text" id="depositTxidInput" placeholder="Ex: 7A1B2C3D"></div>
+    <div style="display: flex; gap: 10px;"><button onclick="closeModal('depositModal')" style="flex: 1; padding: 12px; background: #ccc; border: none; border-radius: 5px; cursor: pointer;">বাতিল</button><button onclick="submitDeposit()" style="flex: 1; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">পেমেন্ট জমা দিন</button></div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div id="withdrawModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">উইথড্র সিস্টেম</div>
+    <div class="form-group"><label>উইথড্র মাধ্যম:</label><select id="withdrawMethod" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;"><option value="bkash">bKash</option><option value="nagad">Nagad</option></select></div>
+    <div class="form-group"><label>উইথড্র অ্যাকাউন্ট নম্বর:</label><input type="text" id="withdrawAccountNumber" placeholder="01XXXXXXXXX"></div>
+    <div class="form-group"><label>পরিমাণ (টাকা):</label><input type="number" id="withdrawAmount" placeholder="ন্যূনতম 500"></div>
+    <div style="display: flex; gap: 10px;"><button onclick="closeModal('withdrawModal')" style="flex: 1; padding: 12px; background: #ccc; border: none; border-radius: 5px; cursor: pointer;">বাতিল</button><button onclick="submitWithdraw()" style="flex: 1; padding: 12px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">উইথড্র কনফার্ম করুন</button></div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div id="historyModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">আমার অ্যাকাউন্টের ইতিহাস</div>
+    <div id="historyContent" style="max-height: 300px; overflow-y: auto; font-size: 14px;"><div style="padding: 10px; border-bottom: 1px solid #eee;">রেজিস্ট্রেশন বোনাস: +৳360.00</div></div>
+    <button onclick="closeModal('historyModal')" style="width: 100%; margin-top: 15px; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">বন্ধ করুন</button>
+  </div>
+</div>
+
+<!-- Firebase SDK & App Logic -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
